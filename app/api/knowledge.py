@@ -8,6 +8,50 @@ from app.knowledge_engine.vector_store import VectorStore
 from app.knowledge_engine.retrieval import RetrievalService
 from app.dependencies import get_embedding_service, get_vector_store, get_retrieval_service
 from app.utils.logging import get_logger
+from fastapi import APIRouter, UploadFile, File
+import os
+import shutil
+
+from app.knowledge_engine.loaders import load_document
+from app.knowledge_engine.chunking import chunk_documents
+from app.dependencies import get_embedding_service, get_vector_store
+
+router = APIRouter(prefix="/knowledge", tags=["Knowledge"])
+
+UPLOAD_DIR = "data/uploads"
+
+@router.post("/upload")
+async def upload_file(file: UploadFile = File(...)):
+    os.makedirs(UPLOAD_DIR, exist_ok=True)
+
+    file_path = os.path.join(UPLOAD_DIR, file.filename)
+
+    with open(file_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+
+    # 1. Load
+    documents = load_document(file_path)
+
+    # 2. Chunk
+    chunks = chunk_documents(documents)
+
+    # 3. Embed
+    embedding_service = get_embedding_service()
+    result = embedding_service.embed_documents(chunks)
+
+    # 4. Store
+    vector_store = get_vector_store()
+    vector_store.add_documents(
+        collection_name=vector_store.collection_name,
+        documents=[c.page_content for c in chunks],
+        embeddings=result["embeddings"],
+        metadatas=result["metadatas"]
+    )
+
+    return {
+        "message": "File processed successfully",
+        "chunks": len(chunks)
+    }
 
 logger = get_logger("api.knowledge")
 

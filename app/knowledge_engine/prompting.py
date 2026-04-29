@@ -1,28 +1,28 @@
 # draft prompts
 
-def build_rfp_prompt(question: str, context: list[str], user_style: str = None):
-    context_text = "\n\n".join(context)
 
-    prompt = f"""
-You are an expert RFP assistant.
+def build_rfp_prompt(query, context_chunks):
+    context_text = "\n\n".join(context_chunks)
 
-Answer the question ONLY using the provided context.
-If the answer is not present, respond with "NOT FOUND".
+    return f"""
+You are an intelligent assistant helping users understand documents.
 
-CONTEXT:
+Use the provided context to answer the question.
+
+IMPORTANT RULES:
+- If the answer is partially available, try to infer logically.
+- Do NOT say "NOT FOUND" unless absolutely no relevant info exists.
+- If abbreviation is present (like RFP), expand it if possible.
+- Be helpful and explain clearly.
+
+Context:
 {context_text}
 
-QUESTION:
-{question}
+Question:
+{query}
 
-Provide a clear and professional answer.
+Answer:
 """
-
-    if user_style:
-        prompt += f"\n\nStyle:\n{user_style}"
-
-    return prompt
-
 
 # compatibility with old code
 def build_draft_prompt(question: str, context_chunks: list):

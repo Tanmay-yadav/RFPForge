@@ -4,6 +4,8 @@ from app.api import knowledge, rfp
 from app.db.session import init_db
 from app.dependencies import get_embedding_service, get_retrieval_service, get_llm_service
 from app.utils.logging import setup_logging
+from fastapi.middleware.cors import CORSMiddleware
+from app.api import chat, knowledge
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -24,10 +26,21 @@ async def lifespan(app: FastAPI):
     print("Shutting down...")
 
 app = FastAPI(title="RFPForge API", lifespan=lifespan)
+# CORS (IMPORTANT for frontend)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-# Include routers
-app.include_router(rfp.router)
+# Register APIs
+app.include_router(chat.router)
 app.include_router(knowledge.router)
+# Include routers
+# app.include_router(rfp.router)
+# app.include_router(knowledge.router)
 
 @app.get("/")
 def root():
