@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
-from app.api import knowledge, rfp
+from app.api import diabetes, knowledge, rfp
 from app.db.session import init_db
 from app.dependencies import get_embedding_service, get_retrieval_service, get_llm_service
 from app.utils.logging import setup_logging
@@ -38,6 +38,7 @@ app.add_middleware(
 # Register APIs
 app.include_router(chat.router)
 app.include_router(knowledge.router)
+app.include_router(diabetes.router)
 # Include routers
 # app.include_router(rfp.router)
 # app.include_router(knowledge.router)

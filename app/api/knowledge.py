@@ -17,6 +17,8 @@ from app.knowledge_engine.chunking import chunk_documents
 from app.dependencies import get_embedding_service, get_vector_store
 
 router = APIRouter(prefix="/knowledge", tags=["Knowledge"])
+logger = get_logger("api.knowledge")
+
 
 UPLOAD_DIR = "data/uploads"
 
@@ -31,6 +33,7 @@ async def upload_file(file: UploadFile = File(...)):
 
     # 1. Load
     documents = load_document(file_path)
+    documents = documents[:50]  # Limit to 50 documents for testing
 
     # 2. Chunk
     chunks = chunk_documents(documents)
@@ -53,9 +56,8 @@ async def upload_file(file: UploadFile = File(...)):
         "chunks": len(chunks)
     }
 
-logger = get_logger("api.knowledge")
 
-router = APIRouter(prefix="/knowledge", tags=["Knowledge"])
+# router = APIRouter(prefix="/knowledge", tags=["Knowledge"])
 
 
 # -----------------------------
@@ -71,7 +73,9 @@ def ingest_knowledge(
         # 1. Load documents
         logger.info("Step 1: Loading documents from 'data/knowledge_docs'...")
         documents = load_directory("data/knowledge_docs")
-
+        
+        # Limit total documents to prevent overload during development
+        documents =documents[:50]
         if not documents:
             logger.warning("No documents found in directory.")
             raise HTTPException(status_code=400, detail="No documents found")

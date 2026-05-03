@@ -1,248 +1,533 @@
-import streamlit as st
-import datetime
 import uuid
-import pandas as pd
-import time
-from typing import List
-from dataclasses import dataclass
-from docx import Document
-from pypdf import PdfReader
 
-# -----------------------------
-# PAGE CONFIG (MUST BE FIRST)
-# -----------------------------
-st.set_page_config(page_title="RFPilot", layout="wide")
-
-# -----------------------------
-# SESSION STATE INIT
-# -----------------------------
-if "rfp_data" not in st.session_state:
-    st.session_state["rfp_data"] = {
-        "rfp_sessions": {},
-        "current_rfp_id": None,
-    }
-
-rfp_data = st.session_state["rfp_data"]
-
-# -----------------------------
-# DATA CLASSES
-# -----------------------------
-@dataclass
-class Source:
-    doc_type: str
-    filename: str
-    section: str
-    snippet: str
-    full_chunk: str
-
-@dataclass
-class Draft:
-    content: str
-    sources: List[Source]
-    version: int
-
-# -----------------------------
-# STREAMING GENERATOR
-# -----------------------------
-def stream_generate(question):
-    full_text = f"""
-### Response to: "{question}"
-
-We use AES-256 encryption for all stored data.
-Backups are encrypted using secure key management systems.
-TLS 1.3 is enforced in transit.
-SOC2 Type II compliant.
-"""
-
-    placeholder = st.empty()
-    streamed_text = ""
-
-    for char in full_text:
-        streamed_text += char
-        placeholder.markdown(streamed_text)
-        time.sleep(0.005)
-
-    return streamed_text
+import requests
+import streamlit as st
 
 
-def generate_sources():
-    return [
-        Source(
-            "knowledge",
-            "Security_Policy_v2.pdf",
-            "Encryption",
-            "AES-256 encryption for data at rest",
-            "Full chunk: We use AES-256 encryption with CMK management and key rotation."
-        ),
-        Source(
-            "knowledge",
-            "Compliance_Doc.pdf",
-            "Certifications",
-            "SOC2 Type II Certified",
-            "Full chunk: Our organization maintains SOC2 Type II certification with annual audits."
-        )
-    ]
+BASE_URL = "http://127.0.0.1:8000"
 
-# -----------------------------
-# FILE PARSING
-# -----------------------------
-def extract_questions(text):
-    lines = text.split("\n")
-    questions = []
-    for line in lines:
-        line = line.strip()
-        if len(line) > 20 and (
-            line.endswith("?")
-            or line.lower().startswith(("describe", "what", "how", "provide", "explain"))
-        ):
-            questions.append(line)
-    return questions
+st.set_page_config(page_title="RFPForge", page_icon="RF", layout="wide")
 
+st.markdown(
+    """
+    <style>
+        .stApp {
+            background: #f7f7f8;
+        }
 
-def parse_docx(file):
-    doc = Document(file)
-    text = "\n".join([p.text for p in doc.paragraphs])
-    return extract_questions(text)
+        [data-testid="stSidebar"] {
+            background: #171717;
+            color: #f4f4f5;
+        }
 
+        [data-testid="stSidebar"] * {
+            color: #f4f4f5;
+        }
 
-def parse_pdf(file):
-    reader = PdfReader(file)
-    text = ""
-    for page in reader.pages:
-        if page.extract_text():
-            text += page.extract_text()
-    return extract_questions(text)
+        [data-testid="stSidebar"] .stButton > button {
+            width: 100%;
+            border: 1px solid #3f3f46;
+            background: #242424;
+            color: #fafafa;
+            border-radius: 8px;
+        }
 
+        [data-testid="stSidebar"] .stButton > button:hover {
+            border-color: #737373;
+            background: #303030;
+        }
 
-def parse_excel(file):
-    df = pd.read_excel(file)
-    questions = []
-    for col in df.columns:
-        for val in df[col]:
-            if isinstance(val, str) and len(val) > 20:
-                questions.append(val)
-    return questions
+        .main .block-container {
+            max-width: 980px;
+            padding-top: 1.25rem;
+            padding-bottom: 7rem;
+        }
 
-# -----------------------------
-# SIDEBAR
-# -----------------------------
-with st.sidebar:
-    st.title("🚀 RFPilot")
+        .rfp-topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
 
-    client = st.text_input("Client Name")
-    deadline = st.date_input("Deadline", value=datetime.date.today())
+        .rfp-brand {
+            display: flex;
+            flex-direction: column;
+            gap: 0.15rem;
+        }
 
-    if st.button("Create RFP", type="primary"):
-        if client:
-            rfp_id = str(uuid.uuid4())[:8]
-            rfp_data["rfp_sessions"][rfp_id] = {
-                "client": client,
-                "deadline": str(deadline),
-                "questions": {}
+        .rfp-title {
+            color: #111827;
+            font-size: 1.05rem;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .rfp-subtitle {
+            color: #6b7280;
+            font-size: 0.84rem;
+        }
+
+        .rfp-session {
+            color: #52525b;
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            padding: 0.35rem 0.7rem;
+            white-space: nowrap;
+        }
+
+        .rfp-empty {
+            min-height: 52vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: #111827;
+        }
+
+        .rfp-empty h1 {
+            font-size: clamp(2rem, 5vw, 3.3rem);
+            font-weight: 650;
+            letter-spacing: 0;
+            margin-bottom: 0.75rem;
+        }
+
+        .rfp-empty p {
+            color: #6b7280;
+            max-width: 560px;
+            font-size: 1rem;
+            line-height: 1.55;
+        }
+
+        [data-testid="stChatMessage"] {
+            background: transparent;
+            padding: 0.55rem 0;
+        }
+
+        [data-testid="stChatMessage"] [data-testid="stMarkdownContainer"] {
+            color: #1f2937;
+            font-size: 0.97rem;
+            line-height: 1.65;
+        }
+
+        [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) {
+            flex-direction: row-reverse;
+        }
+
+        [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"])
+        [data-testid="stMarkdownContainer"] {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 18px;
+            padding: 0.8rem 1rem;
+            max-width: min(720px, 88%);
+            margin-left: auto;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+        }
+
+        [data-testid="stChatInput"] {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        [data-testid="stChatInput"] > div {
+            border-color: #d4d4d8 !important;
+            box-shadow: 0 8px 30px rgba(15, 23, 42, 0.08);
+        }
+
+        [data-testid="stChatInput"] > div:focus-within {
+            border-color: #9ca3af !important;
+            box-shadow: 0 8px 30px rgba(15, 23, 42, 0.12);
+        }
+
+        [data-testid="stChatInput"] textarea {
+            border-radius: 18px;
+            border-color: #d4d4d8;
+            background: #ffffff;
+            color: #111827 !important;
+            caret-color: #111827 !important;
+            -webkit-text-fill-color: #111827 !important;
+        }
+
+        [data-testid="stChatInput"] textarea::placeholder {
+            color: #737373 !important;
+            -webkit-text-fill-color: #737373 !important;
+            opacity: 1;
+        }
+
+        [data-testid="stChatInput"] textarea:focus {
+            border-color: #9ca3af;
+            box-shadow: none;
+        }
+
+        .stAlert {
+            border-radius: 8px;
+        }
+
+        .metric-strip {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 0.75rem;
+            margin: 1rem 0 1.25rem;
+        }
+
+        .metric-card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 0.85rem 0.95rem;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+        }
+
+        .metric-label {
+            color: #6b7280;
+            font-size: 0.75rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .metric-value {
+            color: #111827;
+            font-size: 1.2rem;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .risk-high {
+            color: #b91c1c;
+        }
+
+        .risk-low {
+            color: #047857;
+        }
+
+        .clinical-note {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            color: #4b5563;
+            font-size: 0.88rem;
+            line-height: 1.55;
+            padding: 0.9rem 1rem;
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 900px) {
+            .metric-strip {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
             }
-            rfp_data["current_rfp_id"] = rfp_id
-            st.success("RFP Created")
+        }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
 
-    st.markdown("### Existing RFPs")
-    for r_id, info in rfp_data["rfp_sessions"].items():
-        if st.button(info["client"], key=r_id):
-            rfp_data["current_rfp_id"] = r_id
 
-# -----------------------------
-# MAIN
-# -----------------------------
-st.title("AI-Powered RFP Automation")
+def init_state() -> None:
+    if "messages" not in st.session_state:
+        st.session_state.messages = []
+    if "session_id" not in st.session_state:
+        st.session_state.session_id = str(uuid.uuid4())
+    if "last_uploaded_file" not in st.session_state:
+        st.session_state.last_uploaded_file = None
+    if "upload_status" not in st.session_state:
+        st.session_state.upload_status = "idle"
+    if "upload_detail" not in st.session_state:
+        st.session_state.upload_detail = ""
+    if "active_view" not in st.session_state:
+        st.session_state.active_view = "RFP chat"
+    if "diabetes_messages" not in st.session_state:
+        st.session_state.diabetes_messages = []
+    if "diabetes_result" not in st.session_state:
+        st.session_state.diabetes_result = None
 
-rfp_id = rfp_data.get("current_rfp_id")
 
-if not rfp_id:
-    st.info("Create or select an RFP from sidebar.")
-else:
-    rfp = rfp_data["rfp_sessions"][rfp_id]
+def new_chat() -> None:
+    st.session_state.messages = []
+    st.session_state.session_id = str(uuid.uuid4())
 
-    col1, col2 = st.columns(2)
-    col1.metric("Client", rfp["client"])
-    col2.metric("Deadline", rfp["deadline"])
 
-    st.markdown("---")
+def new_disease_chat() -> None:
+    st.session_state.diabetes_messages = []
+    st.session_state.diabetes_result = None
 
-    # FILE UPLOAD
-    uploaded_file = st.file_uploader("Upload RFP (PDF, DOCX, XLSX)")
 
-    if uploaded_file:
-        questions = []
+def post_file(uploaded_file) -> None:
+    st.session_state.upload_status = "uploading"
+    st.session_state.upload_detail = "Uploading and indexing document..."
 
-        if uploaded_file.name.endswith(".pdf"):
-            questions = parse_pdf(uploaded_file)
-        elif uploaded_file.name.endswith(".docx"):
-            questions = parse_docx(uploaded_file)
-        elif uploaded_file.name.endswith(".xlsx"):
-            questions = parse_excel(uploaded_file)
+    try:
+        response = requests.post(
+            f"{BASE_URL}/knowledge/upload",
+            files={"file": (uploaded_file.name, uploaded_file.getvalue())},
+            timeout=120,
+        )
+        response.raise_for_status()
+        payload = response.json()
+        st.session_state.upload_status = "done"
+        st.session_state.upload_detail = (
+            f"Processed {payload.get('chunks', 0)} chunks from {uploaded_file.name}."
+        )
+    except requests.RequestException as exc:
+        st.session_state.upload_status = "error"
+        st.session_state.upload_detail = f"Upload failed: {exc}"
 
-        for q in questions:
-            q_id = str(uuid.uuid4())[:8]
-            rfp["questions"][q_id] = {"question": q, "drafts": []}
 
-        st.success(f"{len(questions)} questions extracted.")
+def ingest_knowledge() -> None:
+    with st.sidebar.status("Ingesting knowledge...", expanded=False) as status:
+        try:
+            response = requests.post(f"{BASE_URL}/knowledge/ingest", timeout=180)
+            response.raise_for_status()
+            payload = response.json()
+            status.update(
+                label=f"Ingested {payload.get('chunks_created', 0)} chunks.",
+                state="complete",
+            )
+        except requests.RequestException as exc:
+            status.update(label=f"Ingestion failed: {exc}", state="error")
 
-    st.markdown("---")
-    st.header("Questions")
 
-    for q_id, q_data in rfp["questions"].items():
+def stream_reply(prompt: str) -> str:
+    full_response = ""
 
-        with st.expander(q_data["question"][:120]):
+    with requests.post(
+        f"{BASE_URL}/chat/stream",
+        json={"session_id": st.session_state.session_id, "message": prompt},
+        stream=True,
+        timeout=180,
+    ) as response:
+        response.raise_for_status()
+        for chunk in response.iter_content(chunk_size=512, decode_unicode=True):
+            if chunk:
+                full_response += chunk
+                yield full_response
 
-            # Generate draft
-            if not q_data["drafts"]:
-                if st.button("Generate Response", key=f"gen_{q_id}"):
-                    content = stream_generate(q_data["question"])
-                    draft = Draft(
-                        content=content,
-                        sources=generate_sources(),
-                        version=1
-                    )
-                    q_data["drafts"].append(draft)
 
-            # If draft exists
-            if q_data["drafts"]:
-                latest = q_data["drafts"][-1]
+def predict_diabetes(payload: dict) -> dict:
+    response = requests.post(
+        f"{BASE_URL}/diabetes/predict",
+        json=payload,
+        timeout=240,
+    )
+    response.raise_for_status()
+    return response.json()
 
-                edited = st.text_area(
-                    "Draft",
-                    value=latest.content,
-                    height=250,
-                    key=f"text_{q_id}"
+
+def render_topbar(title: str, subtitle: str, badge: str) -> None:
+    st.markdown(
+        f"""
+        <div class="rfp-topbar">
+            <div class="rfp-brand">
+                <div class="rfp-title">{title}</div>
+                <div class="rfp-subtitle">{subtitle}</div>
+            </div>
+            <div class="rfp-session">{badge}</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def render_diabetes_result(result: dict) -> None:
+    prediction_text = "Risk detected" if result["prediction"] == 1 else "Low risk"
+    risk_class = "risk-high" if result["prediction"] == 1 else "risk-low"
+    probability = f'{result["risk_probability"] * 100:.2f}%'
+    threshold = f'{result["threshold"] * 100:.2f}%'
+
+    st.markdown(
+        f"""
+        <div class="metric-strip">
+            <div class="metric-card">
+                <div class="metric-label">Prediction</div>
+                <div class="metric-value {risk_class}">{prediction_text}</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Risk probability</div>
+                <div class="metric-value">{probability}</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Model threshold</div>
+                <div class="metric-value">{threshold}</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">RAG context</div>
+                <div class="metric-value">{result["retrieved_context_count"]}</div>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+    st.caption(result["disclaimer"])
+
+
+def render_rfp_chat() -> None:
+    render_topbar(
+        "RFPForge Chat",
+        "Ask questions against your uploaded RFP knowledge base.",
+        f"Session {st.session_state.session_id[:8]}",
+    )
+
+    if not st.session_state.messages:
+        st.markdown(
+            """
+            <div class="rfp-empty">
+                <h1>How can I help with this RFP?</h1>
+                <p>Upload a document from the sidebar, then ask for summaries, compliance answers, proposal language, or evidence-backed responses.</p>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    for message in st.session_state.messages:
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
+
+    prompt = st.chat_input("Message RFPForge")
+
+    if prompt:
+        st.session_state.messages.append({"role": "user", "content": prompt})
+
+        with st.chat_message("user"):
+            st.markdown(prompt)
+
+        with st.chat_message("assistant"):
+            response_placeholder = st.empty()
+            try:
+                assistant_response = ""
+                for partial_response in stream_reply(prompt):
+                    assistant_response = partial_response
+                    response_placeholder.markdown(assistant_response)
+
+                if not assistant_response:
+                    assistant_response = "I did not receive a response from the backend."
+                    response_placeholder.markdown(assistant_response)
+            except requests.RequestException as exc:
+                assistant_response = f"Backend request failed: {exc}"
+                response_placeholder.error(assistant_response)
+
+        st.session_state.messages.append(
+            {"role": "assistant", "content": assistant_response}
+        )
+
+
+def render_diabetes_chat() -> None:
+    render_topbar(
+        "Disease Prediction RAG Chat",
+        "Run the diabetes XGBoost model and receive RAG-generated precautions and next steps.",
+        "XGBoost + RAG",
+    )
+
+    st.markdown(
+        """
+        <div class="clinical-note">
+            This tool is for educational screening support only. It does not diagnose diabetes or replace medical testing by a qualified clinician.
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    with st.form("diabetes_prediction_form"):
+        col1, col2, col3, col4 = st.columns(4)
+        with col1:
+            pregnancies = st.number_input("Pregnancies", min_value=0.0, value=6.0, step=1.0)
+            skin_thickness = st.number_input("SkinThickness", min_value=0.0, value=35.0, step=1.0)
+        with col2:
+            glucose = st.number_input("Glucose", min_value=0.0, value=148.0, step=1.0)
+            insulin = st.number_input("Insulin", min_value=0.0, value=0.0, step=1.0)
+        with col3:
+            blood_pressure = st.number_input("BloodPressure", min_value=0.0, value=72.0, step=1.0)
+            bmi = st.number_input("BMI", min_value=0.0, value=33.6, step=0.1)
+        with col4:
+            pedigree = st.number_input(
+                "DiabetesPedigreeFunction",
+                min_value=0.0,
+                value=0.627,
+                step=0.001,
+                format="%.3f",
+            )
+            age = st.number_input("Age", min_value=0.0, value=50.0, step=1.0)
+
+        submitted = st.form_submit_button("Predict and generate advice", use_container_width=True)
+
+    if submitted:
+        payload = {
+            "Pregnancies": pregnancies,
+            "Glucose": glucose,
+            "BloodPressure": blood_pressure,
+            "SkinThickness": skin_thickness,
+            "Insulin": insulin,
+            "BMI": bmi,
+            "DiabetesPedigreeFunction": pedigree,
+            "Age": age,
+        }
+
+        user_summary = "\n".join(f"- {key}: {value}" for key, value in payload.items())
+        st.session_state.diabetes_messages.append(
+            {"role": "user", "content": f"Predict diabetes risk using these values:\n\n{user_summary}"}
+        )
+
+        with st.spinner("Running XGBoost prediction and generating RAG advice..."):
+            try:
+                result = predict_diabetes(payload)
+                st.session_state.diabetes_result = result
+                st.session_state.diabetes_messages.append(
+                    {"role": "assistant", "content": result["advice"]}
                 )
+            except requests.RequestException as exc:
+                st.session_state.diabetes_result = None
+                st.error(f"Prediction failed: {exc}")
 
-                col1, col2 = st.columns(2)
+    for message in st.session_state.diabetes_messages:
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
 
-                if col1.button("💾 Save", key=f"save_{q_id}"):
-                    latest.content = edited
-                    st.success("Saved successfully.")
+    if st.session_state.diabetes_result:
+        render_diabetes_result(st.session_state.diabetes_result)
 
-                if col2.button("🔄 Regenerate", key=f"regen_{q_id}"):
-                    content = stream_generate(q_data["question"])
-                    new_draft = Draft(
-                        content=content,
-                        sources=generate_sources(),
-                        version=latest.version + 1
-                    )
-                    q_data["drafts"].append(new_draft)
 
-                # -----------------------------
-                # SOURCES PANEL (NO NESTING)
-                # -----------------------------
-                st.markdown("### 📚 Sources")
+init_state()
 
-                for i, src in enumerate(latest.sources):
+with st.sidebar:
+    st.markdown("### RFPForge")
+    st.session_state.active_view = st.radio(
+        "Workspace",
+        ["RFP chat", "Disease prediction"],
+        index=["RFP chat", "Disease prediction"].index(st.session_state.active_view),
+    )
 
-                    st.markdown(f"**{src.filename} – {src.section}**")
-                    st.write(src.snippet)
+    if st.session_state.active_view == "RFP chat":
+        st.button("New chat", on_click=new_chat, use_container_width=True)
+    else:
+        st.button("Clear disease chat", on_click=new_disease_chat, use_container_width=True)
 
-                    if st.button("View Full Chunk", key=f"chunk_{q_id}_{i}"):
-                        st.info(src.full_chunk)
+    st.divider()
+    st.markdown("#### Knowledge")
+    uploaded_file = st.file_uploader("Upload document", type=["pdf", "docx", "doc", "txt"])
 
-                    st.markdown("---")
+    if uploaded_file and st.session_state.last_uploaded_file != uploaded_file.name:
+        st.session_state.last_uploaded_file = uploaded_file.name
+        post_file(uploaded_file)
 
-    st.markdown("---")
-    st.caption("Streaming • Editable • Versioned • Expandable • Stable")
+    if st.session_state.upload_status == "done":
+        st.success(st.session_state.upload_detail)
+    elif st.session_state.upload_status == "error":
+        st.error(st.session_state.upload_detail)
+    elif st.session_state.upload_status == "uploading":
+        st.info(st.session_state.upload_detail)
+
+    if st.button("Ingest folder", use_container_width=True):
+        ingest_knowledge()
+
+    st.divider()
+    st.caption(f"Backend: {BASE_URL}")
+    st.caption(f"Session: {st.session_state.session_id[:8]}")
+
+if st.session_state.active_view == "RFP chat":
+    render_rfp_chat()
+else:
+    render_diabetes_chat()
