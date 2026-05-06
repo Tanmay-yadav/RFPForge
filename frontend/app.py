@@ -217,9 +217,45 @@ st.markdown(
             margin-bottom: 1rem;
         }
 
+        .input-guide {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.55rem 1rem;
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            color: #374151;
+            font-size: 0.86rem;
+            line-height: 1.45;
+            padding: 0.95rem 1rem;
+            margin: 0.75rem 0 1.1rem;
+        }
+
+        .input-guide strong {
+            color: #111827;
+            font-weight: 700;
+        }
+
+        [data-testid="stNumberInput"] label,
+        [data-testid="stWidgetLabel"],
+        [data-testid="stWidgetLabel"] p {
+            color: #111827 !important;
+            font-weight: 650 !important;
+            opacity: 1 !important;
+        }
+
+        [data-testid="stNumberInput"] input {
+            color: #111827 !important;
+            -webkit-text-fill-color: #111827 !important;
+        }
+
         @media (max-width: 900px) {
             .metric-strip {
                 grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .input-guide {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -427,6 +463,16 @@ def render_diabetes_chat() -> None:
         <div class="clinical-note">
             This tool is for educational screening support only. It does not diagnose diabetes or replace medical testing by a qualified clinician.
         </div>
+        <div class="input-guide">
+            <div><strong>Pregnancies:</strong> number of times pregnant.</div>
+            <div><strong>Glucose:</strong> plasma glucose concentration value.</div>
+            <div><strong>BloodPressure:</strong> diastolic blood pressure in mm Hg.</div>
+            <div><strong>SkinThickness:</strong> triceps skinfold thickness in mm.</div>
+            <div><strong>Insulin:</strong> 2-hour serum insulin value.</div>
+            <div><strong>BMI:</strong> body mass index, weight-to-height ratio.</div>
+            <div><strong>DiabetesPedigreeFunction:</strong> family-history diabetes risk score.</div>
+            <div><strong>Age:</strong> age in years.</div>
+        </div>
         """,
         unsafe_allow_html=True,
     )
@@ -434,14 +480,50 @@ def render_diabetes_chat() -> None:
     with st.form("diabetes_prediction_form"):
         col1, col2, col3, col4 = st.columns(4)
         with col1:
-            pregnancies = st.number_input("Pregnancies", min_value=0.0, value=6.0, step=1.0)
-            skin_thickness = st.number_input("SkinThickness", min_value=0.0, value=35.0, step=1.0)
+            pregnancies = st.number_input(
+                "Pregnancies",
+                min_value=0.0,
+                value=6.0,
+                step=1.0,
+                help="Number of times pregnant.",
+            )
+            skin_thickness = st.number_input(
+                "SkinThickness",
+                min_value=0.0,
+                value=35.0,
+                step=1.0,
+                help="Triceps skinfold thickness measured in millimeters.",
+            )
         with col2:
-            glucose = st.number_input("Glucose", min_value=0.0, value=148.0, step=1.0)
-            insulin = st.number_input("Insulin", min_value=0.0, value=0.0, step=1.0)
+            glucose = st.number_input(
+                "Glucose",
+                min_value=0.0,
+                value=148.0,
+                step=1.0,
+                help="Plasma glucose concentration value.",
+            )
+            insulin = st.number_input(
+                "Insulin",
+                min_value=0.0,
+                value=0.0,
+                step=1.0,
+                help="2-hour serum insulin value.",
+            )
         with col3:
-            blood_pressure = st.number_input("BloodPressure", min_value=0.0, value=72.0, step=1.0)
-            bmi = st.number_input("BMI", min_value=0.0, value=33.6, step=0.1)
+            blood_pressure = st.number_input(
+                "BloodPressure",
+                min_value=0.0,
+                value=72.0,
+                step=1.0,
+                help="Diastolic blood pressure measured in mm Hg.",
+            )
+            bmi = st.number_input(
+                "BMI",
+                min_value=0.0,
+                value=33.6,
+                step=0.1,
+                help="Body mass index.",
+            )
         with col4:
             pedigree = st.number_input(
                 "DiabetesPedigreeFunction",
@@ -449,8 +531,15 @@ def render_diabetes_chat() -> None:
                 value=0.627,
                 step=0.001,
                 format="%.3f",
+                help="A diabetes family-history risk score from the dataset.",
             )
-            age = st.number_input("Age", min_value=0.0, value=50.0, step=1.0)
+            age = st.number_input(
+                "Age",
+                min_value=0.0,
+                value=50.0,
+                step=1.0,
+                help="Age in years.",
+            )
 
         submitted = st.form_submit_button("Predict and generate advice", use_container_width=True)
 

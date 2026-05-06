@@ -33,7 +33,7 @@ async def upload_file(file: UploadFile = File(...)):
 
     # 1. Load
     documents = load_document(file_path)
-    documents = documents[:50]  # Limit to 50 documents for testing
+    # documents = documents  # Limit to 50 documents for testing
 
     # 2. Chunk
     chunks = chunk_documents(documents)
@@ -75,7 +75,7 @@ def ingest_knowledge(
         documents = load_directory("data/knowledge_docs")
         
         # Limit total documents to prevent overload during development
-        documents =documents[:50]
+        # documents =documents[:10]  # Uncomment to limit to first 10 documents for testing
         if not documents:
             logger.warning("No documents found in directory.")
             raise HTTPException(status_code=400, detail="No documents found")

@@ -19,7 +19,8 @@ from typing import List
 from langchain_community.document_loaders import (
     PyPDFLoader,
     Docx2txtLoader,
-    UnstructuredWordDocumentLoader
+    UnstructuredWordDocumentLoader,
+    TextLoader,
 )
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_core.documents import Document
@@ -66,6 +67,9 @@ def get_loader(file_path: str):
 
     elif ext == ".doc":
         return UnstructuredWordDocumentLoader(file_path)
+
+    elif ext == ".txt":
+        return TextLoader(file_path, encoding="utf-8")
 
     else:
         raise ValueError(f"Unsupported file type: {ext}")
@@ -119,16 +123,17 @@ def load_directory(folder_path: str) -> List[Document]:
 
     logging.info(f"Loading documents from directory: {folder_path}")
 
-    for filename in os.listdir(folder_path):
-        file_path = os.path.join(folder_path, filename)
+    for root, _, filenames in os.walk(folder_path):
+        for filename in filenames:
+            file_path = os.path.join(root, filename)
 
-        try:
-            docs = load_document(file_path)
-            all_documents.extend(docs)
-        except ValueError:
-            logging.warning(f"Skipping unsupported file: {filename}")
-        except Exception as e:
-            logging.warning(f"Skipping file due to error: {filename} | {e}")
+            try:
+                docs = load_document(file_path)
+                all_documents.extend(docs)
+            except ValueError:
+                logging.warning(f"Skipping unsupported file: {file_path}")
+            except Exception as e:
+                logging.warning(f"Skipping file due to error: {file_path} | {e}")
 
     logging.info(f"Total documents loaded: {len(all_documents)}")
     return all_documents
