@@ -1,0 +1,33 @@
+{
+  "rows": 297,
+  "columns": 14,
+  "target_column": "target",
+  "class_distribution": {
+    "0": 160,
+    "1": 54,
+    "2": 35,
+    "3": 35,
+    "4": 13
+  },
+  "missing_values": {
+    "age": 0,
+    "sex": 0,
+    "cp": 0,
+    "trestbps": 0,
+    "chol": 0,
+    "fbs": 0,
+    "restecg": 0,
+    "thalach": 0,
+    "exang": 0,
+    "oldpeak": 0,
+    "slope": 0,
+    "ca": 0,
+    "thal": 0,
+    "target": 0
+  },
+  "provenance": {
+    "source": "UCI Heart Disease processed Cleveland dataset",
+    "url": "https://archive.ics.uci.edu/ml/machine-learning-databases/heart-disease/processed.cleveland.data",
+    "notes": "Target values 1-4 are treated as disease-present; 0 is absence."
+  }
+}

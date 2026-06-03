@@ -1,8 +1,7 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
-from app.api import diabetes, knowledge, rfp
+from app.api import diabetes, diseases, knowledge, rfp
 from app.db.session import init_db
-from app.dependencies import get_embedding_service, get_retrieval_service, get_llm_service
 from app.utils.logging import setup_logging
 from fastapi.middleware.cors import CORSMiddleware
 from app.api import chat, knowledge
@@ -14,13 +13,7 @@ async def lifespan(app: FastAPI):
     print("Initializing Database...")
     init_db()
     
-    print("Pre-loading heavy AI models...")
-    # This triggers the singleton initialization
-    get_embedding_service()
-    get_retrieval_service()
-    get_llm_service()
-    
-    print("RFPForge API is ready.")
+    print("RFPForge API is ready. AI/RAG services will lazy-load when needed.")
     yield
     # Shutdown: Clean up if needed
     print("Shutting down...")
@@ -38,6 +31,7 @@ app.add_middleware(
 # Register APIs
 app.include_router(chat.router)
 app.include_router(knowledge.router)
+app.include_router(diseases.router)
 app.include_router(diabetes.router)
 # Include routers
 # app.include_router(rfp.router)

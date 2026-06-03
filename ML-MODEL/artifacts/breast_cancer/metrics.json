@@ -1,0 +1,54 @@
+{
+  "selected_model": "logistic_regression",
+  "selection_metric": "roc_auc",
+  "best_cv_roc_auc": 0.9956,
+  "test_metrics": {
+    "accuracy": 0.9737,
+    "precision": 0.9756,
+    "recall": 0.9524,
+    "f1": 0.9639,
+    "roc_auc": 0.9967
+  },
+  "threshold": 0.44,
+  "best_params": {
+    "model__C": 1.0,
+    "model__class_weight": null
+  },
+  "feature_importance": {
+    "radius_error": 1.726705,
+    "worst_texture": 1.421736,
+    "compactness_error": 1.238453,
+    "worst_symmetry": 1.212732,
+    "area_error": 1.116717,
+    "perimeter_error": 1.10045,
+    "worst_concavity": 1.057586,
+    "mean_concave_points": 1.033897,
+    "worst_radius": 0.95686,
+    "worst_area": 0.94743,
+    "concave_points_error": 0.859011,
+    "mean_concavity": 0.750286,
+    "worst_perimeter": 0.74184,
+    "mean_compactness": 0.717656,
+    "worst_concave_points": 0.711165,
+    "fractal_dimension_error": 0.652376,
+    "mean_texture": 0.528368,
+    "symmetry_error": 0.455145,
+    "mean_smoothness": 0.448667,
+    "mean_symmetry": 0.401052,
+    "mean_area": 0.350512,
+    "worst_smoothness": 0.305416,
+    "texture_error": 0.298924,
+    "mean_radius": 0.26971,
+    "mean_perimeter": 0.258143,
+    "worst_compactness": 0.216712,
+    "worst_fractal_dimension": 0.211975,
+    "concavity_error": 0.19625,
+    "smoothness_error": 0.120318,
+    "mean_fractal_dimension": 0.087235
+  },
+  "probability_calibration": {
+    "method": "CalibratedClassifierCV",
+    "calibration": "sigmoid",
+    "cv": 3
+  }
+}

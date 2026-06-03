@@ -1,0 +1,25 @@
+Disease,Model,Feature,Importance Score
+Chronic Kidney Disease,XGBoost,age,0.006643
+Chronic Kidney Disease,XGBoost,bp,0.0
+Chronic Kidney Disease,XGBoost,sg,0.118673
+Chronic Kidney Disease,XGBoost,al,0.074299
+Chronic Kidney Disease,XGBoost,su,0.0
+Chronic Kidney Disease,XGBoost,bgr,0.011055
+Chronic Kidney Disease,XGBoost,bu,0.00582
+Chronic Kidney Disease,XGBoost,sc,0.054465
+Chronic Kidney Disease,XGBoost,sod,0.012534
+Chronic Kidney Disease,XGBoost,pot,0.009396
+Chronic Kidney Disease,XGBoost,hemo,0.420668
+Chronic Kidney Disease,XGBoost,pcv,0.124027
+Chronic Kidney Disease,XGBoost,wc,0.003533
+Chronic Kidney Disease,XGBoost,rc,0.051429
+Chronic Kidney Disease,XGBoost,rbc,0.0
+Chronic Kidney Disease,XGBoost,pc,0.0
+Chronic Kidney Disease,XGBoost,pcc,0.0
+Chronic Kidney Disease,XGBoost,ba,0.0
+Chronic Kidney Disease,XGBoost,htn,0.059253
+Chronic Kidney Disease,XGBoost,dm,0.048202
+Chronic Kidney Disease,XGBoost,cad,0.0
+Chronic Kidney Disease,XGBoost,appet,0.0
+Chronic Kidney Disease,XGBoost,pe,0.0
+Chronic Kidney Disease,XGBoost,ane,0.0

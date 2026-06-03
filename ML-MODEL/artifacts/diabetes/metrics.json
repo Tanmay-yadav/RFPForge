@@ -1,0 +1,33 @@
+{
+  "selected_model": "xgboost",
+  "selection_metric": "roc_auc",
+  "best_cv_roc_auc": 0.8432,
+  "test_metrics": {
+    "accuracy": 0.7403,
+    "precision": 0.6207,
+    "recall": 0.6667,
+    "f1": 0.6429,
+    "roc_auc": 0.8176
+  },
+  "threshold": 0.57,
+  "best_params": {
+    "model__learning_rate": 0.03,
+    "model__max_depth": 2,
+    "model__n_estimators": 100,
+    "model__subsample": 0.8
+  },
+  "feature_importance": {
+    "Glucose": 0.190704,
+    "BMI_Category": 0.158574,
+    "BMI_Age_Product": 0.15072,
+    "BMI": 0.114086,
+    "Glucose_Age_Ratio": 0.069437,
+    "Insulin": 0.05853,
+    "Insulin_Glucose_Ratio": 0.053362,
+    "SkinThickness": 0.050599,
+    "Age": 0.042029,
+    "DiabetesPedigreeFunction": 0.041099,
+    "Pregnancies": 0.037764,
+    "BloodPressure": 0.033095
+  }
+}

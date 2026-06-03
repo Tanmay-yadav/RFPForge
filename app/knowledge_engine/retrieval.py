@@ -202,10 +202,11 @@ class RetrievalService:
         scores = self._reranker.compute_score(pairs)
 
         # Combine original docs with new scores
-        reranked = [
-            (doc, score)
-            for (doc, _), score in zip(docs_and_scores, scores)
-        ]
+        reranked = []
+        for (doc, embedding_score), rerank_score in zip(docs_and_scores, scores):
+            doc.metadata = dict(getattr(doc, "metadata", {}) or {})
+            doc.metadata["embedding_score"] = float(embedding_score)
+            reranked.append((doc, rerank_score))
 
         # Sort by reranker score
         reranked.sort(key=lambda x: x[1], reverse=True)
@@ -253,6 +254,7 @@ class RetrievalService:
                 {
                     "content": doc.page_content,
                     "score": score,
+                    "embedding_score": doc.metadata.get("embedding_score", score),
                     "metadata": doc.metadata,
                 }
                 for doc, score in docs_and_scores

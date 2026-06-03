@@ -15,6 +15,15 @@ sqlalchemy==2.0.30
 python-multipart==0.0.9
 pydantic==2.7.4
 
+scikit-learn==1.8.0
+imbalanced-learn==0.14.1
+xgboost==3.2.0
+shap==0.51.0
+matplotlib==3.10.9
+seaborn==0.13.2
+joblib==1.5.3
+ucimlrepo==0.0.7
+
 torch==2.10.0
 sentence_transformers==5.2.3
 chromadb==0.4.24

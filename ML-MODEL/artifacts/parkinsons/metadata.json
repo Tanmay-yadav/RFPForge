@@ -1,0 +1,47 @@
+{
+  "disease_id": "parkinsons",
+  "display_name": "Parkinson's Disease Risk",
+  "created_at": "2026-05-06T02:34:18.675434+00:00",
+  "random_state": 42,
+  "cv": "StratifiedKFold(n_splits=5, shuffle=True, random_state=42)",
+  "pipeline": [
+    "features",
+    "imputer",
+    "scaler",
+    "smote",
+    "model"
+  ],
+  "features": [
+    "MDVP_Fo_Hz",
+    "MDVP_Fhi_Hz",
+    "MDVP_Flo_Hz",
+    "MDVP_Jitter_percent",
+    "MDVP_Jitter_Abs",
+    "MDVP_RAP",
+    "MDVP_PPQ",
+    "Jitter_DDP",
+    "MDVP_Shimmer",
+    "MDVP_Shimmer_dB",
+    "Shimmer_APQ3",
+    "Shimmer_APQ5",
+    "MDVP_APQ",
+    "Shimmer_DDA",
+    "NHR",
+    "HNR",
+    "RPDE",
+    "DFA",
+    "spread1",
+    "spread2",
+    "D2",
+    "PPE"
+  ],
+  "target_column": "status",
+  "positive_labels": [
+    1
+  ],
+  "provenance": {
+    "source": "UCI Parkinsons dataset",
+    "url": "https://archive.ics.uci.edu/ml/machine-learning-databases/parkinsons/parkinsons.data",
+    "notes": "status=1 is treated as Parkinson's disease present; status=0 is healthy."
+  }
+}

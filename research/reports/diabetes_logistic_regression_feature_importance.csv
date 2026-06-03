@@ -1,0 +1,11 @@
+Disease,Model,Feature,Importance Score
+Diabetes,Logistic Regression,Pregnancies,0.217955
+Diabetes,Logistic Regression,Glucose,1.09551
+Diabetes,Logistic Regression,BloodPressure,0.041539
+Diabetes,Logistic Regression,SkinThickness,0.047355
+Diabetes,Logistic Regression,Insulin,0.058424
+Diabetes,Logistic Regression,BMI,0.594366
+Diabetes,Logistic Regression,DiabetesPedigreeFunction,0.218596
+Diabetes,Logistic Regression,Age,0.012199
+Diabetes,Logistic Regression,BMI_Age,0.259657
+Diabetes,Logistic Regression,Glucose_BMI,0.012597

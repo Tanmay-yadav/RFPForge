@@ -1,0 +1,11 @@
+Disease,Model,Feature,Importance Score
+Diabetes,XGBoost,Pregnancies,0.066917
+Diabetes,XGBoost,Glucose,0.294052
+Diabetes,XGBoost,BloodPressure,0.043456
+Diabetes,XGBoost,SkinThickness,0.036436
+Diabetes,XGBoost,Insulin,0.091778
+Diabetes,XGBoost,BMI,0.194578
+Diabetes,XGBoost,DiabetesPedigreeFunction,0.062189
+Diabetes,XGBoost,Age,0.036608
+Diabetes,XGBoost,BMI_Age,0.160296
+Diabetes,XGBoost,Glucose_BMI,0.013691

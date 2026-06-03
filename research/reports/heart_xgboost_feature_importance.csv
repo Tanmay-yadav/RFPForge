@@ -1,0 +1,16 @@
+Disease,Model,Feature,Importance Score
+Heart Disease,XGBoost,age,0.052672
+Heart Disease,XGBoost,sex,0.05073
+Heart Disease,XGBoost,cp,0.147066
+Heart Disease,XGBoost,trestbps,0.040503
+Heart Disease,XGBoost,chol,0.032541
+Heart Disease,XGBoost,fbs,0.027246
+Heart Disease,XGBoost,restecg,0.040106
+Heart Disease,XGBoost,thalach,0.035671
+Heart Disease,XGBoost,exang,0.041741
+Heart Disease,XGBoost,oldpeak,0.063126
+Heart Disease,XGBoost,slope,0.0946
+Heart Disease,XGBoost,ca,0.099889
+Heart Disease,XGBoost,thal,0.19021
+Heart Disease,XGBoost,Chol_Age,0.044083
+Heart Disease,XGBoost,BP_HeartRate,0.039816

@@ -1,0 +1,56 @@
+{
+  "disease_id": "breast_cancer",
+  "display_name": "Breast Cancer Risk",
+  "created_at": "2026-05-06T05:33:18.545158+00:00",
+  "random_state": 42,
+  "cv": "StratifiedKFold(n_splits=5, shuffle=True, random_state=42)",
+  "pipeline": [
+    "features",
+    "imputer",
+    "scaler",
+    "smote",
+    "model",
+    "CalibratedClassifierCV(sigmoid)"
+  ],
+  "features": [
+    "mean_radius",
+    "mean_texture",
+    "mean_perimeter",
+    "mean_area",
+    "mean_smoothness",
+    "mean_compactness",
+    "mean_concavity",
+    "mean_concave_points",
+    "mean_symmetry",
+    "mean_fractal_dimension",
+    "radius_error",
+    "texture_error",
+    "perimeter_error",
+    "area_error",
+    "smoothness_error",
+    "compactness_error",
+    "concavity_error",
+    "concave_points_error",
+    "symmetry_error",
+    "fractal_dimension_error",
+    "worst_radius",
+    "worst_texture",
+    "worst_perimeter",
+    "worst_area",
+    "worst_smoothness",
+    "worst_compactness",
+    "worst_concavity",
+    "worst_concave_points",
+    "worst_symmetry",
+    "worst_fractal_dimension"
+  ],
+  "target_column": "target",
+  "positive_labels": [
+    0
+  ],
+  "provenance": {
+    "source": "Wisconsin Diagnostic Breast Cancer dataset packaged with scikit-learn",
+    "url": "https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_breast_cancer.html",
+    "notes": "scikit-learn target 0 is malignant and is treated as the positive/risk class."
+  }
+}

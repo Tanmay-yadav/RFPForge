@@ -1,0 +1,41 @@
+{
+  "disease_id": "heart_disease",
+  "display_name": "Heart Disease Risk",
+  "created_at": "2026-05-06T02:32:47.172952+00:00",
+  "random_state": 42,
+  "cv": "StratifiedKFold(n_splits=5, shuffle=True, random_state=42)",
+  "pipeline": [
+    "features",
+    "imputer",
+    "scaler",
+    "smote",
+    "model"
+  ],
+  "features": [
+    "age",
+    "sex",
+    "cp",
+    "trestbps",
+    "chol",
+    "fbs",
+    "restecg",
+    "thalach",
+    "exang",
+    "oldpeak",
+    "slope",
+    "ca",
+    "thal"
+  ],
+  "target_column": "target",
+  "positive_labels": [
+    1,
+    2,
+    3,
+    4
+  ],
+  "provenance": {
+    "source": "UCI Heart Disease processed Cleveland dataset",
+    "url": "https://archive.ics.uci.edu/ml/machine-learning-databases/heart-disease/processed.cleveland.data",
+    "notes": "Target values 1-4 are treated as disease-present; 0 is absence."
+  }
+}

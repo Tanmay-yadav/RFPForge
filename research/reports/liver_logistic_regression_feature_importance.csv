@@ -1,0 +1,11 @@
+Disease,Model,Feature,Importance Score
+Liver Disease,Logistic Regression,Age,0.283674
+Liver Disease,Logistic Regression,TB,0.105876
+Liver Disease,Logistic Regression,DB,1.078749
+Liver Disease,Logistic Regression,Alkphos,0.142085
+Liver Disease,Logistic Regression,Sgpt,1.113717
+Liver Disease,Logistic Regression,Sgot,1.249511
+Liver Disease,Logistic Regression,TP,0.774411
+Liver Disease,Logistic Regression,ALB,0.987133
+Liver Disease,Logistic Regression,AG_Ratio,0.360112
+Liver Disease,Logistic Regression,Gender,0.075684

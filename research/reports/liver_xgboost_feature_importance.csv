@@ -1,0 +1,11 @@
+Disease,Model,Feature,Importance Score
+Liver Disease,XGBoost,Age,0.088765
+Liver Disease,XGBoost,TB,0.129046
+Liver Disease,XGBoost,DB,0.176134
+Liver Disease,XGBoost,Alkphos,0.088763
+Liver Disease,XGBoost,Sgpt,0.08586
+Liver Disease,XGBoost,Sgot,0.093684
+Liver Disease,XGBoost,TP,0.079145
+Liver Disease,XGBoost,ALB,0.086128
+Liver Disease,XGBoost,AG_Ratio,0.083405
+Liver Disease,XGBoost,Gender,0.089069

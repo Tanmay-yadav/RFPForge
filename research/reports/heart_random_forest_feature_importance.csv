@@ -1,0 +1,16 @@
+Disease,Model,Feature,Importance Score
+Heart Disease,Random Forest,age,0.041095
+Heart Disease,Random Forest,sex,0.022658
+Heart Disease,Random Forest,cp,0.173196
+Heart Disease,Random Forest,trestbps,0.027821
+Heart Disease,Random Forest,chol,0.024182
+Heart Disease,Random Forest,fbs,0.002005
+Heart Disease,Random Forest,restecg,0.007549
+Heart Disease,Random Forest,thalach,0.052653
+Heart Disease,Random Forest,exang,0.053821
+Heart Disease,Random Forest,oldpeak,0.079428
+Heart Disease,Random Forest,slope,0.070354
+Heart Disease,Random Forest,ca,0.131479
+Heart Disease,Random Forest,thal,0.199745
+Heart Disease,Random Forest,Chol_Age,0.047322
+Heart Disease,Random Forest,BP_HeartRate,0.06669

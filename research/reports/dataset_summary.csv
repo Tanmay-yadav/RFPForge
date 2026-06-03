@@ -1,0 +1,5 @@
+Dataset,Samples,Features,Target
+Diabetes,768,8,Outcome
+Heart Disease,297,13,target
+Liver Disease,583,10,Selector
+Chronic Kidney Disease,400,24,class

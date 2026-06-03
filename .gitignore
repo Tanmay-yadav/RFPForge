@@ -13,3 +13,6 @@ embedding_cache/
 rfp.db
 chroma_db/
 test_chroma_db/
+.pytest_cache/
+.pytest_tmp/
+.test_artifacts/

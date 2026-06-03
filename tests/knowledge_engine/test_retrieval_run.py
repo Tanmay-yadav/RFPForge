@@ -56,8 +56,22 @@ def test_search_without_rerank(mock_embedding_service, mock_vector_store):
 
     assert len(results) == 2  # Doc A and Doc B pass threshold
     assert results[0]["score"] >= results[1]["score"]
+    assert results[0]["embedding_score"] == results[0]["score"]
     mock_embedding_service.embed_query.assert_called_once()
     mock_vector_store.similarity_search.assert_called_once()
+
+
+def test_search_passes_metadata_filters_to_vector_store(mock_embedding_service, mock_vector_store):
+    service = RetrievalService(
+        embedding_service=mock_embedding_service,
+        vector_store_service=mock_vector_store,
+        rerank=False,
+    )
+
+    service.search("breast cancer", doc_type="medical", section="breast_cancer")
+
+    _, kwargs = mock_vector_store.similarity_search.call_args
+    assert kwargs["filter"] == {"doc_type": "medical", "section": "breast_cancer"}
 
 
 # ------------------------------------------------------------

@@ -1,0 +1,11 @@
+Disease,Model,Feature,Importance Score
+Diabetes,Random Forest,Pregnancies,0.032967
+Diabetes,Random Forest,Glucose,0.301448
+Diabetes,Random Forest,BloodPressure,0.024176
+Diabetes,Random Forest,SkinThickness,0.036652
+Diabetes,Random Forest,Insulin,0.070184
+Diabetes,Random Forest,BMI,0.15035
+Diabetes,Random Forest,DiabetesPedigreeFunction,0.048412
+Diabetes,Random Forest,Age,0.06193
+Diabetes,Random Forest,BMI_Age,0.194195
+Diabetes,Random Forest,Glucose_BMI,0.079687

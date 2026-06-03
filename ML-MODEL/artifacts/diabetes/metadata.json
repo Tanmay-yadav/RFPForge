@@ -1,0 +1,29 @@
+{
+  "disease_id": "diabetes",
+  "display_name": "Diabetes Risk",
+  "created_at": "2026-05-06T02:21:31.773219+00:00",
+  "random_state": 42,
+  "cv": "StratifiedKFold(n_splits=5, shuffle=True, random_state=42)",
+  "pipeline": [
+    "features",
+    "imputer",
+    "scaler",
+    "smote",
+    "model"
+  ],
+  "features": [
+    "Pregnancies",
+    "Glucose",
+    "BloodPressure",
+    "SkinThickness",
+    "Insulin",
+    "BMI",
+    "DiabetesPedigreeFunction",
+    "Age"
+  ],
+  "target_column": "Outcome",
+  "provenance": {
+    "source": "Local approved diabetes CSV in ML-MODEL/Data/diabetes.csv",
+    "notes": "Common Pima-style diabetes screening dataset. Confirm final citation, license, and inclusion criteria before IEEE submission."
+  }
+}

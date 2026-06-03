@@ -1,0 +1,5 @@
+Disease,Model,Accuracy,Precision,Recall,F1,ROC-AUC,CV Mean Accuracy
+Diabetes,Random Forest,0.7208,0.5733,0.7963,0.6667,0.8248,0.7638
+Heart Disease,Logistic Regression,0.85,0.8519,0.8214,0.8364,0.9498,0.8143
+Liver Disease,Logistic Regression,0.7094,0.9153,0.6506,0.7606,0.8398,0.6288
+Chronic Kidney Disease,Random Forest,1.0,1.0,1.0,1.0,1.0,0.9906

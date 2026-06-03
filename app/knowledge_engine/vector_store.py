@@ -67,10 +67,14 @@ class VectorStore:
     ):
         collection = self.get_collection(collection_name)
 
-        results = collection.query(
-            query_embeddings=[query_embedding],
-            n_results=k
-        )
+        query_kwargs = {
+            "query_embeddings": [query_embedding],
+            "n_results": k,
+        }
+        if filter:
+            query_kwargs["where"] = filter
+
+        results = collection.query(**query_kwargs)
 
         documents = results["documents"][0]
         metadatas = results["metadatas"][0]

@@ -1,0 +1,39 @@
+{
+  "rows": 195,
+  "columns": 23,
+  "target_column": "status",
+  "class_distribution": {
+    "1": 147,
+    "0": 48
+  },
+  "missing_values": {
+    "MDVP_Fo_Hz": 0,
+    "MDVP_Fhi_Hz": 0,
+    "MDVP_Flo_Hz": 0,
+    "MDVP_Jitter_percent": 0,
+    "MDVP_Jitter_Abs": 0,
+    "MDVP_RAP": 0,
+    "MDVP_PPQ": 0,
+    "Jitter_DDP": 0,
+    "MDVP_Shimmer": 0,
+    "MDVP_Shimmer_dB": 0,
+    "Shimmer_APQ3": 0,
+    "Shimmer_APQ5": 0,
+    "MDVP_APQ": 0,
+    "Shimmer_DDA": 0,
+    "NHR": 0,
+    "HNR": 0,
+    "status": 0,
+    "RPDE": 0,
+    "DFA": 0,
+    "spread1": 0,
+    "spread2": 0,
+    "D2": 0,
+    "PPE": 0
+  },
+  "provenance": {
+    "source": "UCI Parkinsons dataset",
+    "url": "https://archive.ics.uci.edu/ml/machine-learning-databases/parkinsons/parkinsons.data",
+    "notes": "status=1 is treated as Parkinson's disease present; status=0 is healthy."
+  }
+}

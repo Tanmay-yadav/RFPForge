@@ -1,0 +1,11 @@
+Disease,Model,Feature,Importance Score
+Liver Disease,Random Forest,Age,0.099395
+Liver Disease,Random Forest,TB,0.120738
+Liver Disease,Random Forest,DB,0.153643
+Liver Disease,Random Forest,Alkphos,0.151652
+Liver Disease,Random Forest,Sgpt,0.107847
+Liver Disease,Random Forest,Sgot,0.118956
+Liver Disease,Random Forest,TP,0.078645
+Liver Disease,Random Forest,ALB,0.089834
+Liver Disease,Random Forest,AG_Ratio,0.067109
+Liver Disease,Random Forest,Gender,0.012182

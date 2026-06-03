@@ -2,12 +2,16 @@ from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
 
 from app.dependencies import get_llm_service, get_retrieval_service
+from app.api.diseases import generate_disease_advice
 from app.knowledge_engine.llm import LLMService
 from app.knowledge_engine.retrieval import RetrievalService
-from app.services.diabetes_prediction import FEATURE_NAMES, diabetes_prediction_service
+from app.ml.registry import feature_names, get_disease_config
+from app.ml.service import disease_prediction_service
 
 
 router = APIRouter(prefix="/diabetes", tags=["Diabetes Prediction"])
+DIABETES_CONFIG = get_disease_config("diabetes")
+FEATURE_NAMES = feature_names(DIABETES_CONFIG)
 
 
 class DiabetesPredictionRequest(BaseModel):
@@ -77,31 +81,18 @@ def predict_diabetes(
     llm_service: LLMService = Depends(get_llm_service),
 ):
     features = request.model_dump()
-    prediction_result = diabetes_prediction_service.predict(features)
-
-    rag_query = (
-        "diabetes risk precautions lifestyle diet exercise monitoring glucose "
-        "when to consult doctor"
+    prediction_result = disease_prediction_service.predict("diabetes", features)
+    advice, context_count = generate_disease_advice(
+        "diabetes",
+        features,
+        prediction_result,
+        retrieval_service,
+        llm_service,
     )
-    retrieved_results = retrieval_service.search(rag_query, top_k=5)
-    context = [item["content"] for item in retrieved_results]
-
-    prompt = _build_advice_prompt(request, prediction_result, context)
-    advice = "".join(llm_service.stream(prompt)).strip()
-
-    if not advice:
-        advice = (
-            "The model result should be reviewed with a qualified clinician. "
-            "Consider confirmatory lab testing, healthy diet changes, regular physical activity, "
-            "weight management if relevant, and glucose monitoring if advised by a doctor."
-        )
 
     return DiabetesPredictionResponse(
         **prediction_result,
         advice=advice,
-        retrieved_context_count=len(context),
-        disclaimer=(
-            "This is educational support from an ML model and RAG assistant, not a medical diagnosis. "
-            "Please consult a qualified healthcare professional."
-        ),
+        retrieved_context_count=context_count,
+        disclaimer=prediction_result["disclaimer"],
     )

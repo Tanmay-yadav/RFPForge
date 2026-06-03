@@ -1,0 +1,16 @@
+Disease,Model,Feature,Importance Score
+Heart Disease,Logistic Regression,age,0.038111
+Heart Disease,Logistic Regression,sex,0.371079
+Heart Disease,Logistic Regression,cp,0.354301
+Heart Disease,Logistic Regression,trestbps,0.181508
+Heart Disease,Logistic Regression,chol,0.099541
+Heart Disease,Logistic Regression,fbs,0.208265
+Heart Disease,Logistic Regression,restecg,0.275371
+Heart Disease,Logistic Regression,thalach,0.082996
+Heart Disease,Logistic Regression,exang,0.287342
+Heart Disease,Logistic Regression,oldpeak,0.306672
+Heart Disease,Logistic Regression,slope,0.272579
+Heart Disease,Logistic Regression,ca,0.650622
+Heart Disease,Logistic Regression,thal,0.624111
+Heart Disease,Logistic Regression,Chol_Age,0.060965
+Heart Disease,Logistic Regression,BP_HeartRate,0.181619
